@@ -68,26 +68,26 @@ Write **1–2 paragraphs** that follow this branch faithfully, staying consisten
 UTILITY_SYSTEM_PROMPT = """You are a precise creative assistant. Follow instructions exactly. No preamble or meta commentary unless the format requires it."""
 
 
-# def genre_remix_user_message(
-#     session_genre: str,
-#     target_genre: str,
-#     prior_context: str,
-#     latest_section: str,
-# ) -> str:
-#     prior = (prior_context or "").strip() or "(none — this is the opening segment)"
-#     return f"""**Task:** Rewrite ONLY the **LATEST SECTION** in the style of **{target_genre}**.
+# # def genre_remix_user_message(
+# #     session_genre: str,
+# #     target_genre: str,
+# #     prior_context: str,
+# #     latest_section: str,
+# # ) -> str:
+# #     prior = (prior_context or "").strip() or "(none — this is the opening segment)"
+# #     return f"""**Task:** Rewrite ONLY the **LATEST SECTION** in the style of **{target_genre}**.
 
-# The session's primary genre has been **{session_genre}**; this block should read as **{target_genre}** while preserving the same plot beats, causality, character roles, and outcomes.
+# # The session's primary genre has been **{session_genre}**; this block should read as **{target_genre}** while preserving the same plot beats, causality, character roles, and outcomes.
 
-# **EARLIER CONTEXT (for continuity only; do not copy into your output):**
-# {prior}
+# # **EARLIER CONTEXT (for continuity only; do not copy into your output):**
+# # {prior}
 
-# **LATEST SECTION — rewrite this in {target_genre}:**
-# {latest_section}
+# # **LATEST SECTION — rewrite this in {target_genre}:**
+# # {latest_section}
 
-# **Output rules:**
-# - Output **only** the rewritten section (final prose), same rough length and paragraph breaks as the original.
-# - No headings, labels, or explanation."""
+# # **Output rules:**
+# # - Output **only** the rewritten section (final prose), same rough length and paragraph breaks as the original.
+# # - No headings, labels, or explanation."""
 
 
 def character_extract_user_message(full_story: str) -> str:
@@ -106,15 +106,15 @@ Reply with **only** this JSON (no markdown fences, no extra keys):
 Use empty array if there are no named characters yet."""
 
 
-def visualization_prompt_user_message(latest_paragraph: str, genre: str, title: str) -> str:
-    return f"""You will write **one** image-generation prompt (English) for the **latest story paragraph** below.
+# def visualization_prompt_user_message(latest_paragraph: str, genre: str, title: str) -> str:
+#     return f"""You will write **one** image-generation prompt (English) for the **latest story paragraph** below.
 
-**Context:** Title «{title}» · genre **{genre}**
+# **Context:** Title «{title}» · genre **{genre}**
 
-**Latest paragraph (visual source):**
-{latest_paragraph}
+# **Latest paragraph (visual source):**
+# {latest_paragraph}
 
-**Requirements:**
-- Single flowing paragraph or compact semicolon list (what a human pastes into DALL·E, Flux, Midjourney).
-- Describe scene, mood, lighting, camera/composition, palette; avoid copyrighted character names or artist names.
-- No preamble — output **only** the image prompt text."""
+# **Requirements:**
+# - Single flowing paragraph or compact semicolon list (what a human pastes into DALL·E, Flux, Midjourney).
+# - Describe scene, mood, lighting, camera/composition, palette; avoid copyrighted character names or artist names.
+# - No preamble — output **only** the image prompt text."""

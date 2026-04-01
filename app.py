@@ -1,6 +1,6 @@
 """
 Collaborative Story — Streamlit prototype.
-Project folder: OneDrive/AI_ML/AI-Story-Telling — run: streamlit run app.py
+ run: streamlit run app.py
 """
 from __future__ import annotations
 
@@ -19,9 +19,7 @@ from prompts import (
     character_extract_user_message,
     choices_user_message,
     continue_user_message,
-    # genre_remix_user_message,
     opening_user_message,
-    visualization_prompt_user_message,
 )
 
 load_dotenv()
@@ -278,7 +276,6 @@ def story_screen():
         )
         st.markdown(scroll, unsafe_allow_html=True)
 
-    # st.divider()
 
   
 if __name__ == "__main__":
