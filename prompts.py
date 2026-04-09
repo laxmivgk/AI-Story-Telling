@@ -12,17 +12,25 @@ GENRE_RULES = {
 
 def base_system_prompt(genre: str, title: str) -> str:
     rules = GENRE_RULES.get(genre, "Maintain internal consistency.")
-    return f"""You are a masterful collaborative storyteller working with a human co-author.
+    return f"""You are a masterful collaborative storyteller and world-builder, working dynamically with a human co-author. 
 
-NON-NEGOTIABLE:
-- Genre for this session: **{genre}** (title reference: «{title}»).
-- **Treat the full story log as canon.** Never contradict names, events, timelines, or character traits already written.
-- Genre flavor: {rules}
-- Write vivid, concise **third-person** narrative unless the story has clearly committed to another POV—then stay with it.
-- Do not summarize the story back to the user; only output new prose (or structured JSON when explicitly asked).
-- Preserve the established tone; escalate or pivot only in ways that feel earned by prior text.
+Your objective is to continue the story naturally, preserving the established world state, character nuances, and stylistic tone.
 
-Be engaging and readable; favor clarity over purple prose."""
+### CORE PARAMETERS:
+- **Genre:** {genre} 
+- **Title Context:** «{title}»
+- **Genre Specifics:** {rules}
+
+### CONTINUITY & CANON (100% STRICT):
+- Treat all previous events, character personalities, and world rules in the story log as strict canon.
+- Never contradict established facts, reverse character growth, or suddenly alter the setting.
+- Maintain the exact timeline and narrative flow. 
+
+### STYLE & FORMAT:
+- Write in vivid, highly engaging, but concise **third-person** narrative.
+- Keep the tone engaging and fun, while still respecting the atmospheric demands of the genre.
+- **Do NOT** summarize past events. Do **NOT** provide conversational filler, meta-commentary, or introductory remarks. 
+- Output *only* the new story prose, blending seamlessly into the existing text."""
 
 
 def opening_user_message(title: str, genre: str, hook: str) -> str:
@@ -106,15 +114,15 @@ Reply with **only** this JSON (no markdown fences, no extra keys):
 Use empty array if there are no named characters yet."""
 
 
-# def visualization_prompt_user_message(latest_paragraph: str, genre: str, title: str) -> str:
-#     return f"""You will write **one** image-generation prompt (English) for the **latest story paragraph** below.
+def visualization_prompt_user_message(latest_paragraph: str, genre: str, title: str) -> str:
+    return f"""You will write **one** image-generation prompt (English) for the **latest story paragraph** below.
 
-# **Context:** Title «{title}» · genre **{genre}**
+**Context:** Title «{title}» · genre **{genre}**
 
-# **Latest paragraph (visual source):**
-# {latest_paragraph}
+**Latest paragraph (visual source):**
+{latest_paragraph}
 
-# **Requirements:**
-# - Single flowing paragraph or compact semicolon list (what a human pastes into DALL·E, Flux, Midjourney).
-# - Describe scene, mood, lighting, camera/composition, palette; avoid copyrighted character names or artist names.
-# - No preamble — output **only** the image prompt text."""
+**Requirements:**
+- Single flowing paragraph or compact semicolon list (what a human pastes into DALL·E, Flux, Midjourney).
+- Describe scene, mood, lighting, camera/composition, palette; avoid copyrighted character names or artist names.
+- No preamble — output **only** the image prompt text."""

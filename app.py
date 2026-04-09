@@ -20,6 +20,7 @@ from prompts import (
     choices_user_message,
     continue_user_message,
     opening_user_message,
+    visualization_prompt_user_message,
 )
 
 load_dotenv()
@@ -184,6 +185,27 @@ def main():
                 st.session_state.viz_prompt_last = ""
                 st.rerun()
 
+            st.subheader("Visualization")
+            if st.button("🎨 Generate Image Prompt"):
+                retry_ui = st.empty()
+                with st.spinner("Writing DALL-E prompt..."):
+                    try:
+                        latest = _latest_paragraph(st.session_state.story)
+                        prompt = chat_completion(
+                            UTILITY_SYSTEM_PROMPT,
+                            visualization_prompt_user_message(latest, st.session_state.genre, st.session_state.title),
+                            temperature=0.7,
+                            max_tokens=300,
+                            on_retry_countdown=lambda s: retry_ui.caption(f"Rate limited — retrying in **{s}s**…"),
+                        )
+                        st.session_state.viz_prompt_last = prompt
+                    except Exception as e:
+                        show_error(e)
+                retry_ui.empty()
+            
+            if st.session_state.get("viz_prompt_last"):
+                st.info(st.session_state.viz_prompt_last)
+
         if st.session_state.phase == "story" and st.button("← New story (reset)", type="secondary"):
             for k in (
                 "phase",
@@ -261,6 +283,15 @@ def setup_screen():
 
 
 def story_screen():
+    st.session_state.setdefault("user_contrib", "")
+
+    def add_user_text():
+        text = st.session_state.user_contrib.strip()
+        if text:
+            push_ai_undo()
+            st.session_state.story += f"\n\n{text}"
+            st.session_state.user_contrib = ""
+
     st.subheader(st.session_state.title or "Untitled")
 
     story_box = st.container()
@@ -275,6 +306,79 @@ def story_screen():
             f"{safe}</div>"
         )
         st.markdown(scroll, unsafe_allow_html=True)
+
+    st.divider()
+
+    if st.session_state.get("choice_options"):
+        st.markdown("### Select a path")
+        for idx, choice_text in enumerate(st.session_state.choice_options):
+            if st.button(f"Option {idx + 1}: {choice_text}", key=f"choice_{idx}"):
+                push_ai_undo()
+                retry_ui = st.empty()
+                with st.spinner(f"Following Option {idx + 1}…"):
+                    try:
+                        continuation = chat_completion(
+                            system(),
+                            apply_choice_user_message(st.session_state.story, choice_text),
+                            temperature=st.session_state.temp,
+                            max_tokens=900,
+                            on_retry_countdown=lambda s: retry_ui.caption(f"Rate limited — retrying in **{s}s**…"),
+                        )
+                        st.session_state.story += f"\n\n{continuation.strip()}"
+                        st.session_state.choice_options = None
+                        st.rerun()
+                    except Exception as e:
+                        show_error(e)
+                retry_ui.empty()
+        
+        if st.button("Cancel Choices"):
+             st.session_state.choice_options = None
+             st.rerun()
+
+    else:
+        st.text_area("Your contribution", placeholder="Type your next sentences here...", height=100, key="user_contrib")
+        col1, col2, col3 = st.columns([1, 1, 1])
+        
+        with col1:
+            st.button("Add My Text", use_container_width=True, on_click=add_user_text)
+                 
+        with col2:
+            if st.button("✨ Continue with AI", use_container_width=True):
+                push_ai_undo()
+                retry_ui = st.empty()
+                with st.spinner("AI is writing..."):
+                    try:
+                        continuation = chat_completion(
+                            system(),
+                            continue_user_message(st.session_state.story),
+                            temperature=st.session_state.temp,
+                            max_tokens=900,
+                            on_retry_countdown=lambda s: retry_ui.caption(f"Rate limited — retrying in **{s}s**…"),
+                        )
+                        st.session_state.story += f"\n\n{continuation.strip()}"
+                        st.rerun()
+                    except Exception as e:
+                        show_error(e)
+                retry_ui.empty()
+                 
+        with col3:
+            if st.button("🛣️ Give Me Choices", use_container_width=True):
+                retry_ui = st.empty()
+                with st.spinner("AI is generating options..."):
+                    try:
+                        raw_choices = chat_completion(
+                            system(),
+                            choices_user_message(st.session_state.story),
+                            temperature=st.session_state.temp,
+                            max_tokens=500,
+                            on_retry_countdown=lambda s: retry_ui.caption(f"Rate limited — retrying in **{s}s**…"),
+                        )
+                        choices = parse_choices_json(raw_choices)
+                        st.session_state.choice_options = choices
+                        st.rerun()
+                    except Exception as e:
+                        show_error(e)
+                retry_ui.empty()
 
 
   
