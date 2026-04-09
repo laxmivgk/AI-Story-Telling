@@ -1,6 +1,6 @@
 # 📖 AI Story-Telling
 
-A collaborative, genre-aware storytelling application built with Python, Streamlit, and the Groq LLM API.
+A genre-aware storytelling application built with Python, Streamlit, and the Groq LLM API.
 
 ## 1. Setup Instructions
 
